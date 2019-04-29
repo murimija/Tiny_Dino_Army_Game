@@ -1,4 +1,4 @@
-﻿﻿using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,17 +12,11 @@ public class DinoController : MonoBehaviour
     public HPController HPOfAttackedTarget;
 
     [SerializeField] private int damage;
-    [SerializeField] private Animator dinoAnimator;
+    [SerializeField] public Animator dinoAnimator;
     private static readonly int Walk = Animator.StringToHash("walk");
-
-    private void Start()
-    {
-       Debug.Log("Test_001");
-    }
 
     void FixedUpdate()
     {
-        Debug.Log("1");
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 targetPositionRay = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -49,7 +43,7 @@ public class DinoController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Enter");
+//        Debug.Log("Enter");
         if (other.tag != "Egg") return;
         HPOfAttackedTarget = other.GetComponent<HPController>();
         StartCoroutine("AttackCoroutine");
@@ -61,13 +55,17 @@ public class DinoController : MonoBehaviour
         {
             HPOfAttackedTarget.takeDamage(damage);
             yield return new WaitForSeconds(1f);
-            
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
         HPOfAttackedTarget = null;
-        Debug.Log("Exit");
+//        Debug.Log("Exit");
+    }
+
+    public void Death()
+    {
+        Destroy(gameObject);
     }
 }

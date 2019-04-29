@@ -57,12 +57,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\GameController.cs" />
     <Compile Include="Assets\Scripts\DinoController.cs" />
     <Compile Include="Assets\Scripts\EggController.cs" />
     <Compile Include="Assets\Scripts\EnemyArea.cs" />
     <Compile Include="Assets\Scripts\EnemyController.cs" />
     <Compile Include="Assets\Scripts\HPController.cs" />
-    <Compile Include="Assets\Scripts\Test.cs" />
+    <Compile Include="Assets\Scripts\PauseMenu.cs" />
+    <Compile Include="Assets\Scripts\SceneChanger.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>C:/Users/123/Documents/GitHub/Tiny_Dino_Army_Game/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>

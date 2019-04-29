@@ -19,7 +19,6 @@ public class HPController : MonoBehaviour
     {
         if (!helthBarExsist)
         {
-//            Debug.Log(healthBarImage == false);
             healthBarPref.SetActive(true);
             helthBarExsist = true;
         }
@@ -38,7 +37,9 @@ public class HPController : MonoBehaviour
     {
         if (gameObject.CompareTag("Egg"))
             gameObject.GetComponent<EggController>().OpenEgg();
+        if (gameObject.CompareTag("PlayersDino"))
+            gameObject.GetComponent<DinoController>().Death();
 
-        Destroy(gameObject);
+        //Destroy(gameObject);
     }
 }

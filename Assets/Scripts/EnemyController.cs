@@ -8,41 +8,40 @@ using Random = UnityEngine.Random;
 
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
+    [Header("Prefab settings")] [SerializeField]
+    private Animator animator;
+
     [NonSerialized] public Transform[] patrolPointsArray;
-    [SerializeField] private int damage;
+
     [SerializeField] private float attackWaitTime;
     [SerializeField] private GameObject partForRotation;
 
+    [Header("Game settings")] [SerializeField]
+    private int damage;
+
+    [SerializeField] private float attackRange;
+    [SerializeField] private float observeRange;
+
     private int numOfActualPatrolPoint = 0;
     private NavMeshAgent enemyAgent;
-    private Transform target;
+    private GameObject target;
     private HPController HPOfAttacedTarget;
     private float timeToUpdate = 0.5f;
     private float MinDistToPatrollPoint;
     private Vector3 nextPatrollPoint;
 
-
-    public enum State
-    {
-        Patrol,
-        Follow,
-        Attack
-    }
-
-    public State CurrentState = State.Patrol;
     private static readonly int IsAttack = Animator.StringToHash("isAttack");
-    private bool isAtack;
+    private bool isAttack;
     private static readonly int TakeDamage = Animator.StringToHash("takeDamage");
-
+    private GameObject[] dinos;
+    private float shortestDistance;
 
     private void Start()
     {
         enemyAgent = GetComponent<NavMeshAgent>();
         MinDistToPatrollPoint = enemyAgent.stoppingDistance;
-        GotoNextPatrolPoint();
 
-        StartCoroutine("CheckStateAndUpdate");
+        InvokeRepeating(nameof(UpdateTarget), 0, 0.5f);
     }
 
     void GotoNextPatrolPoint()
@@ -56,96 +55,91 @@ public class EnemyController : MonoBehaviour
                 : new Quaternion(0, 0, 0, 0);
     }
 
-    private IEnumerator CheckStateAndUpdate()
+    private void Patrol()
     {
-        while (true)
+        if (enemyAgent.remainingDistance <= MinDistToPatrollPoint)
         {
-            if (CurrentState == State.Patrol)
-            {
-                if (enemyAgent.remainingDistance <= MinDistToPatrollPoint)
-                {
-                    GotoNextPatrolPoint();
-                }
-            }
-            else if (CurrentState == State.Follow)
-            {
-                Follow();
-            }
-            else if (CurrentState == State.Attack)
-            {
-                if (!isAtack)
-                {
-                    StartAttack();
-                }
-            }
-
-            yield return new WaitForSeconds(timeToUpdate);
+            GotoNextPatrolPoint();
         }
     }
 
     private void Follow()
     {
-        enemyAgent.SetDestination(target.position);
-        if (enemyAgent.remainingDistance <= MinDistToPatrollPoint + 0.2f)
-        {
-            CurrentState = State.Attack;
-        }
+        enemyAgent.SetDestination(target.transform.position);
     }
 
     #region Attack
 
     private void StartAttack()
     {
-        if (target != null)
-        {
-            animator.SetBool(IsAttack, true);
-            HPOfAttacedTarget = target.GetComponent<HPController>();
-            StartCoroutine("Attack");
-            isAtack = true;
-        }
+        isAttack = true;
+        HPOfAttacedTarget = target.GetComponent<HPController>();
+        StartCoroutine("Attack");
+
+        animator.SetBool(IsAttack, true);
     }
 
     IEnumerator Attack()
     {
-        while (true)
+        while (isAttack)
         {
-            if (target != null && Vector3.Distance(target.position, gameObject.transform.position) < 0.4f)
-            {
-                HPOfAttacedTarget.takeDamage(damage);
-                target.GetComponent<DinoController>().dinoAnimator.SetTrigger("takeDamage");
-            }
-
-            else
-            {
-                StopAttack();
-            }
-
+            HPOfAttacedTarget.takeDamage(damage);
+            target.GetComponent<DinoController>().dinoAnimator.SetTrigger("takeDamage");
             yield return new WaitForSeconds(attackWaitTime);
         }
     }
 
     private void StopAttack()
     {
+        isAttack = false;
         animator.SetBool(IsAttack, false);
-        StopCoroutine("Attack");
-        isAtack = false;
-        GotoNextPatrolPoint();
-        CurrentState = State.Patrol;
     }
 
     #endregion
 
-    private void OnTriggerEnter(Collider other)
+    private void UpdateTarget()
     {
-        if (other.CompareTag("PlayersDino"))
+        dinos = GameObject.FindGameObjectsWithTag("PlayersDino");
+        shortestDistance = Mathf.Infinity;
+        GameObject nearestDino = null;
+        foreach (var dino in dinos)
         {
-            target = other.transform;
-            CurrentState = State.Follow;
+            var distanceToEnemy = Vector3.Distance(transform.position, dino.transform.position);
+            if (!(distanceToEnemy < shortestDistance)) continue;
+            shortestDistance = distanceToEnemy;
+            nearestDino = dino;
+        }
+
+        if (nearestDino != null && shortestDistance <= attackRange && !isAttack)
+        {
+            target = nearestDino;
+            StartAttack();
+        }
+        else if (nearestDino != null && shortestDistance <= observeRange)
+        {
+            target = nearestDino;
+            StopAttack();
+            Follow();
+        }
+        else
+        {
+            target = null;
+            StopAttack();
+            Patrol();
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    private void OnDrawGizmos()
     {
-        StopAttack();
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, observeRange);
+    }
+
+    public void Death()
+    {
+        Destroy(gameObject);
     }
 }

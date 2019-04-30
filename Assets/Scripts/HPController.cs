@@ -39,6 +39,8 @@ public class HPController : MonoBehaviour
             gameObject.GetComponent<EggController>().OpenEgg();
         if (gameObject.CompareTag("PlayersDino"))
             gameObject.GetComponent<DinoController>().Death();
+        if (gameObject.CompareTag("Enemy"))
+            gameObject.GetComponent<EnemyController>().Death();
 
         //Destroy(gameObject);
     }

@@ -139,8 +139,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1060680847469147517}
-  - component: {fileID: 9018303125610067489}
   - component: {fileID: 9018303125610067488}
+  - component: {fileID: 9018303125610067489}
   - component: {fileID: 4966709123534372928}
   - component: {fileID: 6272654496079431240}
   - component: {fileID: 2178079330986199212}
@@ -167,6 +167,26 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9018303125610067488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9018303125610067519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7fe8e3251dd38143bec8cd0e15822db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 9018303125610067489}
+  partForRotation: {fileID: 1585410032234502663}
+  HPOfAttackedTarget: {fileID: 0}
+  dinoAnimator: {fileID: 824052363185531109}
+  damage: 10
+  openEggDistance: 0.2
+  attackWaitTime: 0.5
+  attackDistanse: 0.3
 --- !u!195 &9018303125610067489
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -189,23 +209,6 @@ NavMeshAgent:
   m_BaseOffset: 0.1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &9018303125610067488
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9018303125610067519}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7fe8e3251dd38143bec8cd0e15822db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agent: {fileID: 9018303125610067489}
-  partForRotation: {fileID: 1585410032234502663}
-  HPOfAttackedTarget: {fileID: 0}
-  damage: 10
-  dinoAnimator: {fileID: 824052363185531109}
 --- !u!114 &4966709123534372928
 MonoBehaviour:
   m_ObjectHideFlags: 0

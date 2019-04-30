@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Egg
   - PlayersDino
+  - Enemy
   layers:
   - Default
   - TransparentFX

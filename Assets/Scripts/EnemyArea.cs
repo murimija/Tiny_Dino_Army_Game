@@ -52,8 +52,4 @@ public class EnemyArea : MonoBehaviour
             yield return new WaitForSeconds(timeSpanWait);
         }
     }
-
-    private void Update()
-    {
-    }
 }

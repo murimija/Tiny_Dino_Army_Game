@@ -4,6 +4,16 @@ using UnityEngine.UI;
 
 public class SceneChanger : MonoBehaviour
 {
+    public static SceneChanger instance;
+
+    private void Awake()
+    {
+        if (instance != null)
+            return;
+
+        instance = this;
+    }
+    
     [SerializeField] private GameObject curtainForScenesTransition;
     private string nextScene;
     private static readonly int ChangeScene = Animator.StringToHash("changeScene");

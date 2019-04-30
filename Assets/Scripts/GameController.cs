@@ -1,4 +1,4 @@
-﻿﻿﻿using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,11 +21,20 @@ public class GameController : MonoBehaviour
     [SerializeField] private Text damageOfDinosText;
     private int damageOfArmy;
 
+    private SceneChanger sceneChanger;
+    private GameObject[] aliveDino;
+
+    private void Start()
+    {
+        sceneChanger = SceneChanger.instance;
+    }
+
     public void UpdateAliveDino()
     {
-        var aliveDino = GameObject.FindGameObjectsWithTag("PlayersDino");
+        aliveDino = GameObject.FindGameObjectsWithTag("PlayersDino");
+        Debug.Log(aliveDino);
 
-        if (aliveDino == null)
+        if (aliveDino.Length == 0)
         {
             GameOver();
             return;
@@ -39,7 +48,6 @@ public class GameController : MonoBehaviour
 
         numOfDinosText.text = aliveDino.Length.ToString();
         damageOfDinosText.text = damageOfArmy.ToString();
-
     }
 
     public void DinoDeathReport()
@@ -47,13 +55,15 @@ public class GameController : MonoBehaviour
         Invoke("UpdateAliveDino", 0.1f);
     }
 
-    private void FixedUpdate()
+    private void GoToGameOverScene()
     {
-//        if()
+        sceneChanger.GoToScene("GameOver");
     }
 
     void GameOver()
     {
+        Time.timeScale = 0.5f;
+        Invoke("GoToGameOverScene", 1f);
         Debug.Log("Game Over!");
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -9,13 +10,14 @@ public class DinoController : MonoBehaviour
     private NavMeshAgent agent;
 
     [SerializeField] private GameObject partForRotation;
-    [SerializeField] public HPController HPOfAttackedTarget;
+    [NonSerialized] public HPController HPOfAttackedTarget;
     [SerializeField] public Animator dinoAnimator;
 
     private static readonly int Walk = Animator.StringToHash("walk");
+    private static readonly int Attack = Animator.StringToHash("attack");
 
-    [Header("Game Settings")] [SerializeField]
-    public int damage;
+    [Header("Game Settings")] 
+    [SerializeField] public int damage;
 
     [SerializeField] private float openEggDistance;
     [SerializeField] private float attackWaitTime;
@@ -72,6 +74,7 @@ public class DinoController : MonoBehaviour
 
     private void AttackEnemy()
     {
+        dinoAnimator.SetTrigger(Attack);
         HPOfAttackedTarget.takeDamage(damage);
     }
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Analytics;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
@@ -52,18 +48,19 @@ public class GameController : MonoBehaviour
 
     public void DinoDeathReport()
     {
-        Invoke("UpdateAliveDino", 0.1f);
+        Invoke(nameof(UpdateAliveDino), 0.1f);
     }
 
     private void GoToGameOverScene()
     {
         sceneChanger.GoToScene("GameOver");
+        Time.timeScale = 1f;
     }
 
-    void GameOver()
+    private void GameOver()
     {
         Time.timeScale = 0.5f;
-        Invoke("GoToGameOverScene", 1f);
+        Invoke(nameof(GoToGameOverScene), 1f);
         Debug.Log("Game Over!");
     }
 }

@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\CameraController.cs" />
     <Compile Include="Assets\Scripts\DinoController.cs" />
     <Compile Include="Assets\Scripts\EggController.cs" />
     <Compile Include="Assets\Scripts\EnemyArea.cs" />

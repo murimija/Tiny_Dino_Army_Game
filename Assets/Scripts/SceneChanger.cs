@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class SceneChanger : MonoBehaviour
 {
@@ -13,15 +12,15 @@ public class SceneChanger : MonoBehaviour
 
         instance = this;
     }
-    
+
     [SerializeField] private GameObject curtainForScenesTransition;
     private string nextScene;
     private static readonly int ChangeScene = Animator.StringToHash("changeScene");
-    private static float timeOfAnimation = 1f;
+    private const float timeOfAnimation = 1f;
 
     private void Start()
     {
-        Invoke("ternOffCurtain", timeOfAnimation);
+        Invoke(nameof(ternOffCurtain), timeOfAnimation);
     }
 
     public void GoToScene(string nameOfScene)
@@ -29,11 +28,11 @@ public class SceneChanger : MonoBehaviour
         nextScene = nameOfScene;
         curtainForScenesTransition.SetActive(true);
         curtainForScenesTransition.GetComponent<Animator>().SetTrigger(ChangeScene);
-        Invoke("onTransitionComplete", timeOfAnimation);
+        Invoke(nameof(onTransitionComplete), timeOfAnimation);
     }
 
     // ReSharper disable once UnusedMember.Global
-    public void onTransitionComplete()
+    private void onTransitionComplete()
     {
         SceneManager.LoadScene(nextScene);
     }

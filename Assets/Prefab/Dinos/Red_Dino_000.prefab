@@ -182,10 +182,10 @@ MonoBehaviour:
   agent: {fileID: 9018303125610067489}
   partForRotation: {fileID: 1714977624172291955}
   dinoAnimator: {fileID: 3684375919389792696}
-  damage: 10
+  damage: 4
   openEggDistance: 0.2
   attackWaitTime: 0.5
-  attackDistanse: 0.3
+  attackDistanse: 0.5
 --- !u!195 &9018303125610067489
 NavMeshAgent:
   m_ObjectHideFlags: 0

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,25 +8,24 @@ public class DinoController : MonoBehaviour
     private NavMeshAgent agent;
 
     [SerializeField] private GameObject partForRotation;
-    [NonSerialized] public HPController HPOfAttackedTarget;
+    private HPController HPOfAttackedTarget;
     [SerializeField] public Animator dinoAnimator;
 
     private static readonly int Walk = Animator.StringToHash("walk");
     private static readonly int Attack = Animator.StringToHash("attack");
 
-    [Header("Game Settings")] 
-    [SerializeField] public int damage;
+    [Header("Game Settings")] [SerializeField]
+    public int damage;
 
     [SerializeField] private float openEggDistance;
     [SerializeField] private float attackWaitTime;
     [SerializeField] private float attackDistanse;
-    
+
     private GameController gameController;
     private GameObject[] eggs;
     private float shortestDistanceToEdd;
     private GameObject target;
     private bool isOpeningEgg;
-    
 
 
     private void Start()
@@ -36,25 +33,24 @@ public class DinoController : MonoBehaviour
         gameController = GameController.instance;
         gameController.UpdateAliveDino();
 
-        InvokeRepeating("UpdateTarget", 0, 0.5f);
+        InvokeRepeating(nameof(UpdateTarget), 0, 0.5f);
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         if (Input.GetMouseButtonDown(0))
         {
             Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit);
-            if (hit.collider.CompareTag("Enemy") && 
+            if (hit.collider.CompareTag("Enemy") &&
                 Vector3.Distance(transform.position, hit.collider.transform.position) <= attackDistanse)
             {
-                Debug.Log(hit.collider.name);
                 HPOfAttackedTarget = hit.collider.gameObject.GetComponent<HPController>();
                 AttackEnemy();
             }
             else
             {
-                Vector3 targetPositionRay = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                Vector3 direction = targetPositionRay - transform.position;
+                var targetPositionRay = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                var direction = targetPositionRay - transform.position;
 
                 partForRotation.transform.localRotation =
                     direction.x >= 0 ? new Quaternion(0, 0, 0, 0) : new Quaternion(0, 1, 0, 0);
@@ -62,14 +58,7 @@ public class DinoController : MonoBehaviour
             }
         }
 
-        if (agent.desiredVelocity.Equals(Vector3.zero))
-        {
-            dinoAnimator.SetBool(Walk, false);
-        }
-        else
-        {
-            dinoAnimator.SetBool(Walk, true);
-        }
+        dinoAnimator.SetBool(Walk, !agent.desiredVelocity.Equals(Vector3.zero));
     }
 
     private void AttackEnemy()
@@ -82,7 +71,7 @@ public class DinoController : MonoBehaviour
     {
         HPOfAttackedTarget = target.GetComponent<HPController>();
         isOpeningEgg = true;
-        StartCoroutine("AttackCoroutine");
+        StartCoroutine(nameof(AttackCoroutine));
     }
 
     private IEnumerator AttackCoroutine()
@@ -126,11 +115,11 @@ public class DinoController : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
-        Gizmos.DrawWireSphere(transform.position, openEggDistance);
-        
+        var position = transform.position;
+        Gizmos.DrawWireSphere(position, openEggDistance);
+
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackDistanse);
-        
+        Gizmos.DrawWireSphere(position, attackDistanse);
     }
 
     public void Death()

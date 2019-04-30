@@ -1,9 +1,7 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class EnemyController : MonoBehaviour
@@ -22,11 +20,11 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float attackRange;
     [SerializeField] private float observeRange;
 
-    private int numOfActualPatrolPoint = 0;
+    private int numOfActualPatrolPoint;
     private NavMeshAgent enemyAgent;
     private GameObject target;
-    private HPController HPOfAttacedTarget;
-    private float timeToUpdate = 0.5f;
+    private HPController HPOfAttackedTarget;
+    private float timeToUpdate;
     private float MinDistToPatrollPoint;
     private Vector3 nextPatrollPoint;
 
@@ -44,7 +42,7 @@ public class EnemyController : MonoBehaviour
         InvokeRepeating(nameof(UpdateTarget), 0, 0.5f);
     }
 
-    void GotoNextPatrolPoint()
+    private void GotoNextPatrolPoint()
     {
         nextPatrollPoint = patrolPointsArray[Random.Range(0, patrolPointsArray.Length)].position;
         enemyAgent.SetDestination(nextPatrollPoint);
@@ -73,18 +71,18 @@ public class EnemyController : MonoBehaviour
     private void StartAttack()
     {
         isAttack = true;
-        HPOfAttacedTarget = target.GetComponent<HPController>();
-        StartCoroutine("Attack");
+        HPOfAttackedTarget = target.GetComponent<HPController>();
+        StartCoroutine(nameof(Attack));
 
         animator.SetBool(IsAttack, true);
     }
 
-    IEnumerator Attack()
+    private IEnumerator Attack()
     {
         while (isAttack)
         {
-            HPOfAttacedTarget.takeDamage(damage);
-            target.GetComponent<DinoController>().dinoAnimator.SetTrigger("takeDamage");
+            HPOfAttackedTarget.takeDamage(damage);
+            target.GetComponent<DinoController>().dinoAnimator.SetTrigger(TakeDamage);
             yield return new WaitForSeconds(attackWaitTime);
         }
     }
@@ -119,23 +117,26 @@ public class EnemyController : MonoBehaviour
         {
             target = nearestDino;
             StopAttack();
+            enemyAgent.speed = 0.35f;
             Follow();
         }
         else
         {
             target = null;
             StopAttack();
+            enemyAgent.speed = 0.2f;
             Patrol();
         }
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
+        var position = transform.position;
+        Gizmos.DrawWireSphere(position, attackRange);
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, observeRange);
+        Gizmos.DrawWireSphere(position, observeRange);
     }
 
     public void Death()

@@ -181,9 +181,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 9018303125610067489}
   partForRotation: {fileID: 1585410032234502663}
-  HPOfAttackedTarget: {fileID: 0}
   dinoAnimator: {fileID: 824052363185531109}
-  damage: 10
+  damage: 2
   openEggDistance: 0.2
   attackWaitTime: 0.5
   attackDistanse: 0.3

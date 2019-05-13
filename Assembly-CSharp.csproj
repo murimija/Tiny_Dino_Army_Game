@@ -66,6 +66,8 @@
     <Compile Include="Assets\Scripts\HPController.cs" />
     <Compile Include="Assets\Scripts\PauseMenu.cs" />
     <Compile Include="Assets\Scripts\SceneChanger.cs" />
+    <Compile Include="Assets\Scripts\ScreenHelper.cs" />
+    <Compile Include="Assets\Scripts\SelectManager.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>C:/Users/123/Documents/GitHub/Tiny_Dino_Army_Game/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>

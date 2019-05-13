@@ -11,6 +11,8 @@ public class DinoController : MonoBehaviour
     private HPController HPOfAttackedTarget;
     [SerializeField] public Animator dinoAnimator;
 
+    private GameObject markerToGo;
+
     private static readonly int Walk = Animator.StringToHash("walk");
     private static readonly int Attack = Animator.StringToHash("attack");
 
@@ -33,12 +35,14 @@ public class DinoController : MonoBehaviour
         gameController = GameController.instance;
         gameController.UpdateAliveDino();
 
+        markerToGo = gameController.markerToGoPref;
+
         InvokeRepeating(nameof(UpdateTarget), 0, 0.5f);
     }
 
     private void FixedUpdate()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit);
             if (hit.collider.CompareTag("Enemy") &&
@@ -55,6 +59,8 @@ public class DinoController : MonoBehaviour
                 partForRotation.transform.localRotation =
                     direction.x >= 0 ? new Quaternion(0, 0, 0, 0) : new Quaternion(0, 1, 0, 0);
                 agent.SetDestination(hit.point);
+
+ //               MarkPlaceToGo(hit.point);
             }
         }
 
@@ -120,6 +126,11 @@ public class DinoController : MonoBehaviour
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(position, attackDistanse);
+    }
+
+    private void MarkPlaceToGo(Vector3 plaseToClick)
+    {
+        Destroy(Instantiate(markerToGo, plaseToClick, Quaternion.identity), 1f);
     }
 
     public void Death()

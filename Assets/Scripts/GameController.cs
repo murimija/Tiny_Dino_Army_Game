@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour
 
     [SerializeField] private Text numOfDinosText;
     [SerializeField] private Text damageOfDinosText;
+    [SerializeField] public GameObject markerToGoPref;
     private int damageOfArmy;
 
     private SceneChanger sceneChanger;

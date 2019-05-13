@@ -14,6 +14,7 @@ public class SceneChanger : MonoBehaviour
     }
 
     [SerializeField] private GameObject curtainForScenesTransition;
+    
     private string nextScene;
     private static readonly int ChangeScene = Animator.StringToHash("changeScene");
     private const float timeOfAnimation = 1f;

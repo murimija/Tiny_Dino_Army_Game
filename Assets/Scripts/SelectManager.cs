@@ -1,38 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
-public class SelectManager : MonoBehaviour {
-
+public class SelectManager : MonoBehaviour
+{
     RaycastHit hit;
-    public List<Transform> selectedUnits = new List<Transform>();
-    bool isDragging = false;
-    Vector3 mousePositon;
+    public List<GameObject> selectedUnits = new List<GameObject>();
+    private bool isDragging = false;
+    private Vector3 mousePosition;
 
+    [SerializeField] private GameObject plaseToGoPref;
 
     private void OnGUI()
     {
-        if(isDragging)
+        if (isDragging)
         {
-            var rect = ScreenHelper.GetScreenRect(mousePositon, Input.mousePosition);
+            var rect = ScreenHelper.GetScreenRect(mousePosition, Input.mousePosition);
             ScreenHelper.DrawScreenRect(rect, new Color(0.8f, 0.8f, 0.95f, 0.1f));
-            ScreenHelper.DrawScreenRectBorder(rect, 1, Color.blue);
+            ScreenHelper.DrawScreenRectBorder(rect, 4, Color.blue);
         }
-        
-        
     }
 
     // Update is called once per frame
-    void Update () {
-		
+    void Update()
+    {
         //Detect if mouse is down
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
-            mousePositon = Input.mousePosition;
+            mousePosition = Input.mousePosition;
             //Create a ray from the camera to our space
             var camRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             //Shoot that ray and get the hit data
-            if(Physics.Raycast(camRay, out hit))
+            if (Physics.Raycast(camRay, out hit))
             {
                 //Do something with that data 
                 //Debug.Log(hit.transform.tag);
@@ -40,12 +40,15 @@ public class SelectManager : MonoBehaviour {
                 {
                     SelectUnit(hit.transform, Input.GetKey(KeyCode.LeftShift));
                 }
+                else if (hit.transform.CompareTag("Enemy"))
+                {
+                    return;
+                }
                 else
                 {
                     isDragging = true;
                 }
             }
-
         }
 
         if (Input.GetMouseButtonUp(0))
@@ -53,8 +56,10 @@ public class SelectManager : MonoBehaviour {
             if (isDragging)
             {
                 DeselectUnits();
-                foreach (var selectableObject in FindObjectsOfType<CapsuleCollider>())
+                var type = FindObjectsOfType<DinoController>();
+                for (var i = 0; i < type.Length; i++)
                 {
+                    var selectableObject = type[i];
                     if (IsWithinSelectionBounds(selectableObject.transform))
                     {
                         SelectUnit(selectableObject.transform, true);
@@ -63,39 +68,60 @@ public class SelectManager : MonoBehaviour {
 
                 isDragging = false;
             }
-            
         }
 
+        if (Input.GetMouseButtonUp(1) && selectedUnits.Count != 0)
+        {
+            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
+            for (var i = 0; i < selectedUnits.Count; i++)
+            {
+                if (selectedUnits[i]!=null)
+                {
+                    selectedUnits[i].GetComponent<DinoController>().GoToNewPlace(hit.point);
+                }
+            }
+
+            Destroy(Instantiate(plaseToGoPref, hit.point, Quaternion.identity), 1f);
+        }
     }
 
-    private void SelectUnit(Transform unit, bool isMultiSelect = false)
+
+    private void SelectUnit(Component unit, bool isMultiSelect = false)
     {
-        if(!isMultiSelect)
+        if (!isMultiSelect)
         {
             DeselectUnits();
         }
-        selectedUnits.Add(unit);
-        unit.Find("Highlight_00").gameObject.SetActive(true);
+
+        if (unit != null)
+        {
+            selectedUnits.Add(unit.gameObject);
+            unit.GetComponent<DinoController>().SetHighlightState(true);
+        }
     }
 
     private void DeselectUnits()
     {
-        for(int i = 0; i < selectedUnits.Count; i++)
+        for (int i = 0; i < selectedUnits.Count; i++)
         {
-            selectedUnits[i].Find("Highlight_00").gameObject.SetActive(false);
+            if (selectedUnits[i]!=null)
+            {
+                selectedUnits[i].transform.GetComponent<DinoController>().SetHighlightState(false);
+            }
         }
+
         selectedUnits.Clear();
     }
 
     private bool IsWithinSelectionBounds(Transform transform)
     {
-        if(!isDragging)
+        if (!isDragging)
         {
             return false;
         }
 
         var camera = Camera.main;
-        var viewportBounds = ScreenHelper.GetViewportBounds(camera, mousePositon, Input.mousePosition);
+        var viewportBounds = ScreenHelper.GetViewportBounds(camera, mousePosition, Input.mousePosition);
         return viewportBounds.Contains(camera.WorldToViewportPoint(transform.position));
     }
 }

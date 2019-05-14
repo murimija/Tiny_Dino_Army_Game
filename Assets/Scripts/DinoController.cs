@@ -1,6 +1,7 @@
-﻿using System.Collections;
+﻿﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.EventSystems;
 
 public class DinoController : MonoBehaviour
 {
@@ -10,11 +11,12 @@ public class DinoController : MonoBehaviour
     [SerializeField] private GameObject partForRotation;
     private HPController HPOfAttackedTarget;
     [SerializeField] public Animator dinoAnimator;
-
-    private GameObject markerToGo;
+    [SerializeField] public GameObject highlightPref;
 
     private static readonly int Walk = Animator.StringToHash("walk");
     private static readonly int Attack = Animator.StringToHash("attack");
+
+    private bool isSelected;
 
     [Header("Game Settings")] [SerializeField]
     public int damage;
@@ -33,38 +35,36 @@ public class DinoController : MonoBehaviour
     private void Start()
     {
         gameController = GameController.instance;
+        gameController.AddDinoToList(gameObject);
         gameController.UpdateAliveDino();
-
-        markerToGo = gameController.markerToGoPref;
-
+        
         InvokeRepeating(nameof(UpdateTarget), 0, 0.5f);
     }
-
+    
     private void FixedUpdate()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(0))
         {
             Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit);
             if (hit.collider.CompareTag("Enemy") &&
-                Vector3.Distance(transform.position, hit.collider.transform.position) <= attackDistanse)
+                Vector3.Distance(transform.position, hit.collider.transform.position) <= attackDistanse && 
+            isSelected)
             {
                 HPOfAttackedTarget = hit.collider.gameObject.GetComponent<HPController>();
                 AttackEnemy();
             }
-            else
-            {
-                var targetPositionRay = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                var direction = targetPositionRay - transform.position;
-
-                partForRotation.transform.localRotation =
-                    direction.x >= 0 ? new Quaternion(0, 0, 0, 0) : new Quaternion(0, 1, 0, 0);
-                agent.SetDestination(hit.point);
-
- //               MarkPlaceToGo(hit.point);
-            }
         }
 
         dinoAnimator.SetBool(Walk, !agent.desiredVelocity.Equals(Vector3.zero));
+    }
+
+    public void GoToNewPlace(Vector3 newDestination)
+    {
+        agent.SetDestination(newDestination);
+        var direction = newDestination - transform.position;
+
+        partForRotation.transform.localRotation =
+            direction.x >= 0 ? new Quaternion(0, 0, 0, 0) : new Quaternion(0, 1, 0, 0);
     }
 
     private void AttackEnemy()
@@ -84,7 +84,9 @@ public class DinoController : MonoBehaviour
     {
         while (isOpeningEgg)
         {
+
             HPOfAttackedTarget.takeDamage(damage);
+
             yield return new WaitForSeconds(attackWaitTime);
         }
     }
@@ -95,6 +97,7 @@ public class DinoController : MonoBehaviour
         shortestDistanceToEdd = Mathf.Infinity;
 
         GameObject nearestEgg = null;
+        Debug.Log("1");
 
         foreach (var egg in eggs)
         {
@@ -118,7 +121,7 @@ public class DinoController : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.white;
         var position = transform.position;
@@ -128,14 +131,15 @@ public class DinoController : MonoBehaviour
         Gizmos.DrawWireSphere(position, attackDistanse);
     }
 
-    private void MarkPlaceToGo(Vector3 plaseToClick)
+    public void SetHighlightState(bool state)
     {
-        Destroy(Instantiate(markerToGo, plaseToClick, Quaternion.identity), 1f);
+        highlightPref.SetActive(state);
+        isSelected = state;
     }
 
     public void Death()
     {
-        gameController.DinoDeathReport();
+        gameController.DinoDeathReport(gameObject);
         Destroy(gameObject);
     }
 }

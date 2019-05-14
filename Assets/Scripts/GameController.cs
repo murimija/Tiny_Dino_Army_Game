@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
@@ -15,40 +16,48 @@ public class GameController : MonoBehaviour
 
     [SerializeField] private Text numOfDinosText;
     [SerializeField] private Text damageOfDinosText;
-    [SerializeField] public GameObject markerToGoPref;
     private int damageOfArmy;
 
     private SceneChanger sceneChanger;
     private GameObject[] aliveDino;
 
+    public List<GameObject> listOfEggs = new List<GameObject>();
+    public List<GameObject> listOfDino = new List<GameObject>();
+    public List<GameObject> listOfEnemy = new List<GameObject>();
+
     private void Start()
     {
         sceneChanger = SceneChanger.instance;
+
+        listOfEggs.AddRange(GameObject.FindGameObjectsWithTag("Egg"));
+
+     //   listOfEnemy.AddRange(GameObject.FindGameObjectsWithTag("Enemy"));
     }
 
     public void UpdateAliveDino()
     {
-        aliveDino = GameObject.FindGameObjectsWithTag("PlayersDino");
-        Debug.Log(aliveDino);
-
-        if (aliveDino.Length == 0)
+              
+        if (listOfDino.Count == 0)
         {
             GameOver();
             return;
         }
 
         damageOfArmy = 0;
-        foreach (var dino in aliveDino)
-        {
-            damageOfArmy += dino.GetComponent<DinoController>().damage;
-        }
 
-        numOfDinosText.text = aliveDino.Length.ToString();
-        damageOfDinosText.text = damageOfArmy.ToString();
+/*        for (var i = 0; i < listOfDino.Count; i++)
+        {
+            var dino = aliveDino[i];
+            damageOfArmy += dino.GetComponent<DinoController>().damage;
+        }*/
+
+        numOfDinosText.text = listOfDino.Count.ToString();
+//        damageOfDinosText.text = damageOfArmy.ToString();
     }
 
-    public void DinoDeathReport()
+    public void DinoDeathReport(GameObject dinoToRemove)
     {
+        listOfDino.Remove(dinoToRemove);
         Invoke(nameof(UpdateAliveDino), 0.1f);
     }
 
@@ -63,5 +72,15 @@ public class GameController : MonoBehaviour
         Time.timeScale = 0.5f;
         Invoke(nameof(GoToGameOverScene), 1f);
         Debug.Log("Game Over!");
+    }
+
+    public void AddDinoToList(GameObject dinoToAdd)
+    {
+        listOfDino.Add(dinoToAdd);
+    }
+    
+    public void AddEggToList(GameObject eggToAdd)
+    {
+        listOfDino.Add(eggToAdd);
     }
 }

@@ -28,15 +28,11 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         sceneChanger = SceneChanger.instance;
-
-        listOfEggs.AddRange(GameObject.FindGameObjectsWithTag("Egg"));
-
-     //   listOfEnemy.AddRange(GameObject.FindGameObjectsWithTag("Enemy"));
+        
     }
 
     public void UpdateAliveDino()
     {
-              
         if (listOfDino.Count == 0)
         {
             GameOver();
@@ -79,8 +75,4 @@ public class GameController : MonoBehaviour
         listOfDino.Add(dinoToAdd);
     }
     
-    public void AddEggToList(GameObject eggToAdd)
-    {
-        listOfDino.Add(eggToAdd);
-    }
 }

@@ -22,6 +22,17 @@ public class SelectManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        CreatePointToGoMatrix();
+
+
+        for (int i = 0; i < 10; i++)
+        {
+            Debug.Log(pointToGoMatrix[i]);
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -75,9 +86,10 @@ public class SelectManager : MonoBehaviour
             Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
             for (var i = 0; i < selectedUnits.Count; i++)
             {
-                if (selectedUnits[i]!=null)
+                if (selectedUnits[i] != null)
                 {
-                    selectedUnits[i].GetComponent<DinoController>().GoToNewPlace(hit.point);
+                    selectedUnits[i].GetComponent<DinoController>().GoToNewPlace(hit.point + pointToGoMatrix[i]);
+                    Debug.Log(pointToGoMatrix[i]);
                 }
             }
 
@@ -104,7 +116,7 @@ public class SelectManager : MonoBehaviour
     {
         for (int i = 0; i < selectedUnits.Count; i++)
         {
-            if (selectedUnits[i]!=null)
+            if (selectedUnits[i] != null)
             {
                 selectedUnits[i].transform.GetComponent<DinoController>().SetHighlightState(false);
             }
@@ -124,4 +136,48 @@ public class SelectManager : MonoBehaviour
         var viewportBounds = ScreenHelper.GetViewportBounds(camera, mousePosition, Input.mousePosition);
         return viewportBounds.Contains(camera.WorldToViewportPoint(transform.position));
     }
+
+    #region "Creation of Point To Go Grid"
+
+    [SerializeField] private GameObject pointToGoPref;
+
+    private Vector3[] pointToGoMatrix = new Vector3[61];
+
+    private readonly float numOfRings = 2;
+    private readonly float diamOfHex = 0.2f;
+
+    private int pointCounter;
+
+    private void CreatePointToGoMatrix()
+    {
+        pointCounter = 0;
+        pointToGoMatrix[pointCounter] = Vector3.zero;
+
+        var north = new Vector3(0, 0, 1);
+        var northEast = new Vector3(Mathf.Cos(Mathf.PI / 6) * 1, 0, Mathf.Sin(Mathf.PI / 6) * 1);
+        var southEast = new Vector3(Mathf.Cos(Mathf.PI / 6) * 1, 0, -Mathf.Sin(Mathf.PI / 6) * 1);
+
+        for (var i = 1; i <= numOfRings; i++)
+        {
+            buildRayOfHex(north, southEast, i);
+            buildRayOfHex(northEast, -north, i);
+            buildRayOfHex(southEast, -northEast, i);
+            buildRayOfHex(-north, -southEast, i);
+            buildRayOfHex(-northEast, north, i);
+            buildRayOfHex(-southEast, northEast, i);
+        }
+    }
+
+    private void buildRayOfHex(Vector3 startDirection, Vector3 direction, int numOfCurrentRing)
+    {
+        var spawnPosition = startDirection * diamOfHex * numOfCurrentRing;
+        for (int i = 1; i <= numOfCurrentRing; i++)
+        {
+            pointCounter++;
+            pointToGoMatrix[pointCounter] = spawnPosition;
+            spawnPosition += direction * diamOfHex;
+        }
+    }
+
+    #endregion
 }

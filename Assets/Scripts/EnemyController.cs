@@ -34,12 +34,16 @@ public class EnemyController : MonoBehaviour
     private GameObject[] dinos;
     private float shortestDistance;
 
+    private GameController gameController;
+    
     private void Start()
     {
         enemyAgent = GetComponent<NavMeshAgent>();
         MinDistToPatrollPoint = enemyAgent.stoppingDistance;
+        
+        gameController = GameController.instance;
 
-        InvokeRepeating(nameof(UpdateTarget), 0, 0.5f);
+        StartCoroutine(nameof(UpdateTarget));
     }
 
     private void GotoNextPatrolPoint()
@@ -81,8 +85,11 @@ public class EnemyController : MonoBehaviour
     {
         while (isAttack)
         {
-            HPOfAttackedTarget.takeDamage(damage);
-            target.GetComponent<DinoController>().dinoAnimator.SetTrigger(TakeDamage);
+            if (HPOfAttackedTarget!=null)
+            {
+                HPOfAttackedTarget.takeDamage(damage);
+                target.GetComponent<DinoController>().dinoAnimator.SetTrigger(TakeDamage);
+            }
             yield return new WaitForSeconds(attackWaitTime);
         }
     }
@@ -95,37 +102,40 @@ public class EnemyController : MonoBehaviour
 
     #endregion
 
-    private void UpdateTarget()
+    private IEnumerator UpdateTarget()
     {
-        dinos = GameObject.FindGameObjectsWithTag("PlayersDino");
-        shortestDistance = Mathf.Infinity;
-        GameObject nearestDino = null;
-        foreach (var dino in dinos)
+        while (true)
         {
-            var distanceToEnemy = Vector3.Distance(transform.position, dino.transform.position);
-            if (!(distanceToEnemy < shortestDistance)) continue;
-            shortestDistance = distanceToEnemy;
-            nearestDino = dino;
-        }
+            shortestDistance = Mathf.Infinity;
+            GameObject nearestDino = null;
+            foreach (var dino in gameController.listOfDino)
+            {
+                var distanceToEnemy = Vector3.Distance(transform.position, dino.transform.position);
+                if (!(distanceToEnemy < shortestDistance)) continue;
+                shortestDistance = distanceToEnemy;
+                nearestDino = dino;
+            }
 
-        if (nearestDino != null && shortestDistance <= attackRange && !isAttack)
-        {
-            target = nearestDino;
-            StartAttack();
-        }
-        else if (nearestDino != null && shortestDistance <= observeRange)
-        {
-            target = nearestDino;
-            StopAttack();
-            enemyAgent.speed = 0.35f;
-            Follow();
-        }
-        else
-        {
-            target = null;
-            StopAttack();
-            enemyAgent.speed = 0.2f;
-            Patrol();
+            if (nearestDino != null && shortestDistance <= attackRange && !isAttack)
+            {
+                target = nearestDino;
+                StartAttack();
+            }
+            else if (nearestDino != null && shortestDistance <= observeRange)
+            {
+                target = nearestDino;
+                StopAttack();
+                enemyAgent.speed = 0.35f;
+                Follow();
+            }
+            else
+            {
+                target = null;
+                StopAttack();
+                enemyAgent.speed = 0.2f;
+                Patrol();
+            }
+            yield return new WaitForSeconds(0.5f);
         }
     }
 

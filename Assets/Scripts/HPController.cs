@@ -8,6 +8,7 @@ public class HPController : MonoBehaviour
     [SerializeField] private GameObject healthBarPref;
     [SerializeField] private Image healthBarImage;
     private bool helthBarExsist;
+    private bool isDead = false;
 
     private void Start()
     {
@@ -27,9 +28,10 @@ public class HPController : MonoBehaviour
 
         healthBarImage.fillAmount = (float) currentHealthPoints / maxHealthPoints;
 
-        if (currentHealthPoints <= 0)
+        if (currentHealthPoints <= 0 && !isDead)
         {
             death();
+            isDead = true;
         }
     }
 
@@ -42,6 +44,5 @@ public class HPController : MonoBehaviour
         if (gameObject.CompareTag("Enemy"))
             gameObject.GetComponent<EnemyController>().Death();
 
-        //Destroy(gameObject);
     }
 }

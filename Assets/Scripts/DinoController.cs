@@ -38,7 +38,7 @@ public class DinoController : MonoBehaviour
         gameController.AddDinoToList(gameObject);
         gameController.UpdateAliveDino();
         
-        InvokeRepeating(nameof(UpdateTarget), 0, 0.5f);
+        StartCoroutine(nameof(CheckNearEgg));
     }
     
     private void FixedUpdate()
@@ -77,47 +77,56 @@ public class DinoController : MonoBehaviour
     {
         HPOfAttackedTarget = target.GetComponent<HPController>();
         isOpeningEgg = true;
-        StartCoroutine(nameof(AttackCoroutine));
+        StartCoroutine(nameof(OpenEggCoroutine));
     }
 
-    private IEnumerator AttackCoroutine()
+    private IEnumerator OpenEggCoroutine()
     {
         while (isOpeningEgg)
         {
-
-            HPOfAttackedTarget.takeDamage(damage);
-
+            
+            if ( HPOfAttackedTarget!=null)
+            {
+                HPOfAttackedTarget.takeDamage(damage);
+                
+            }
+            else
+            {
+                target = null;
+                isOpeningEgg = false;
+            }
             yield return new WaitForSeconds(attackWaitTime);
         }
     }
 
-    private void UpdateTarget()
+    private IEnumerator CheckNearEgg()
     {
-        eggs = GameObject.FindGameObjectsWithTag("Egg");
-        shortestDistanceToEdd = Mathf.Infinity;
-
-        GameObject nearestEgg = null;
-        Debug.Log("1");
-
-        foreach (var egg in eggs)
+        while (true)
         {
-            var distanceToEgg = Vector3.Distance(transform.position, egg.transform.position);
-            if (!(distanceToEgg < shortestDistanceToEdd)) continue;
-            shortestDistanceToEdd = distanceToEgg;
-            nearestEgg = egg;
-        }
+            shortestDistanceToEdd = Mathf.Infinity;
+
+            GameObject nearestEgg = null;
+
+            foreach (var egg in gameController.listOfEggs)
+            {
+                var distanceToEgg = Vector3.Distance(transform.position, egg.transform.position);
+                if (!(distanceToEgg < shortestDistanceToEdd)) continue;
+                shortestDistanceToEdd = distanceToEgg;
+                nearestEgg = egg;
+            }
 
 
-        if (nearestEgg != null && shortestDistanceToEdd <= openEggDistance && !isOpeningEgg)
-        {
-            target = nearestEgg;
-
-            StartOpenEgg();
-        }
-        else
-        {
-            target = null;
-            isOpeningEgg = false;
+            if (nearestEgg != null && shortestDistanceToEdd <= openEggDistance && !isOpeningEgg)
+            {
+                target = nearestEgg;
+                StartOpenEgg();
+            }
+            else
+            {
+                target = null;
+                isOpeningEgg = false;
+            }
+            yield return new WaitForSeconds(0.5f);
         }
     }
 

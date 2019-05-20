@@ -180,14 +180,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5291038f9c641f348a05d999c916398c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damage: 10
+  attackRange: 0.3
+  observeRange: 0.8
   animator: {fileID: 32980526216224372}
   attackWaitTime: 1.5
   partForRotation: {fileID: 32980526216224378}
   exclamationMarkPref: {fileID: 849201543132307834, guid: 6b1f49691932b9548ae66f8c0e129c72,
     type: 3}
-  damage: 10
-  attackRange: 0.3
-  observeRange: 0.8
 --- !u!114 &8275666184265693516
 MonoBehaviour:
   m_ObjectHideFlags: 0

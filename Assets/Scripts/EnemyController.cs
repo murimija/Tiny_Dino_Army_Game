@@ -6,6 +6,12 @@ using Random = UnityEngine.Random;
 
 public class EnemyController : MonoBehaviour
 {
+    [Header("Game settings")] [SerializeField]
+    private int damage;
+
+    [SerializeField] private float attackRange;
+    [SerializeField] private float observeRange;
+
     [Header("Prefab settings")] [SerializeField]
     private Animator animator;
 
@@ -13,12 +19,7 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField] private float attackWaitTime;
     [SerializeField] private GameObject partForRotation;
-
-    [Header("Game settings")] [SerializeField]
-    private int damage;
-
-    [SerializeField] private float attackRange;
-    [SerializeField] private float observeRange;
+    [SerializeField] private GameObject exclamationMarkPref;
 
     private int numOfActualPatrolPoint;
     private NavMeshAgent enemyAgent;
@@ -29,80 +30,107 @@ public class EnemyController : MonoBehaviour
     private Vector3 nextPatrollPoint;
 
     private static readonly int IsAttack = Animator.StringToHash("isAttack");
-    private bool isAttack;
     private static readonly int TakeDamage = Animator.StringToHash("takeDamage");
     private GameObject[] dinos;
     private float shortestDistance;
 
     private GameController gameController;
-    
+
+    private const float updateStateTime = 0.5f;
+
+    private enum State
+    {
+        Attack,
+        Follow,
+        Patroll
+    }
+
+    private State currentState;
+
+    private void ChangeState(State newState)
+    {
+        if (currentState == newState) return;
+
+        if (newState == State.Patroll)
+        {
+            currentState = State.Patroll;
+            StartCoroutine(nameof(Patrol));
+        }
+        else if (newState == State.Follow)
+        {
+            currentState = State.Follow;
+            StartCoroutine(nameof(Follow));
+        }
+        else
+        {
+            currentState = State.Attack;
+            StartCoroutine(nameof(Attack));
+        }
+    }
+
     private void Start()
     {
         enemyAgent = GetComponent<NavMeshAgent>();
         MinDistToPatrollPoint = enemyAgent.stoppingDistance;
-        
+
         gameController = GameController.instance;
 
-        StartCoroutine(nameof(UpdateTarget));
+        StartCoroutine(nameof(UpdateTargetAndState));
     }
 
-    private void GotoNextPatrolPoint()
+    private IEnumerator Patrol()
     {
-        nextPatrollPoint = patrolPointsArray[Random.Range(0, patrolPointsArray.Length)].position;
-        enemyAgent.SetDestination(nextPatrollPoint);
-
-        partForRotation.transform.localRotation =
-            (nextPatrollPoint - transform.position).x >= 0
-                ? new Quaternion(0, 1, 0, 0)
-                : new Quaternion(0, 0, 0, 0);
-    }
-
-    private void Patrol()
-    {
-        if (enemyAgent.remainingDistance <= MinDistToPatrollPoint)
+        while (currentState == State.Patroll)
         {
-            GotoNextPatrolPoint();
+            if (enemyAgent.remainingDistance <= MinDistToPatrollPoint)
+            {
+                nextPatrollPoint = patrolPointsArray[Random.Range(0, patrolPointsArray.Length)].position;
+                enemyAgent.SetDestination(nextPatrollPoint);
+
+                partForRotation.transform.localRotation =
+                    (nextPatrollPoint - transform.position).x >= 0
+                        ? new Quaternion(0, 1, 0, 0)
+                        : new Quaternion(0, 0, 0, 0);
+            }
+
+            yield return new WaitForSeconds(updateStateTime);
         }
     }
 
-    private void Follow()
+    private IEnumerator Follow()
     {
-        enemyAgent.SetDestination(target.transform.position);
-    }
+        Destroy(
+            Instantiate(exclamationMarkPref, gameObject.transform.position, Quaternion.identity,
+                gameObject.transform), 1f);
 
-    #region Attack
-
-    private void StartAttack()
-    {
-        isAttack = true;
-        HPOfAttackedTarget = target.GetComponent<HPController>();
-        StartCoroutine(nameof(Attack));
-
-        animator.SetBool(IsAttack, true);
+        while (currentState == State.Follow)
+        {
+            enemyAgent.SetDestination(target.transform.position);
+            yield return new WaitForSeconds(updateStateTime);
+        }
     }
 
     private IEnumerator Attack()
     {
-        while (isAttack)
+        HPOfAttackedTarget = target.GetComponent<HPController>();
+
+        animator.SetBool(IsAttack, true);
+
+        while (currentState == State.Attack)
         {
-            if (HPOfAttackedTarget!=null)
+            if (HPOfAttackedTarget != null)
             {
                 HPOfAttackedTarget.takeDamage(damage);
                 target.GetComponent<DinoController>().dinoAnimator.SetTrigger(TakeDamage);
             }
+
             yield return new WaitForSeconds(attackWaitTime);
         }
-    }
 
-    private void StopAttack()
-    {
-        isAttack = false;
         animator.SetBool(IsAttack, false);
     }
 
-    #endregion
-
-    private IEnumerator UpdateTarget()
+    private IEnumerator UpdateTargetAndState()
     {
         while (true)
         {
@@ -116,26 +144,22 @@ public class EnemyController : MonoBehaviour
                 nearestDino = dino;
             }
 
-            if (nearestDino != null && shortestDistance <= attackRange && !isAttack)
+            if (nearestDino != null && shortestDistance <= attackRange)
             {
                 target = nearestDino;
-                StartAttack();
+                ChangeState(State.Attack);
             }
             else if (nearestDino != null && shortestDistance <= observeRange)
             {
                 target = nearestDino;
-                StopAttack();
-                enemyAgent.speed = 0.35f;
-                Follow();
+                ChangeState(State.Follow);
             }
             else
             {
                 target = null;
-                StopAttack();
-                enemyAgent.speed = 0.2f;
-                Patrol();
+                ChangeState(State.Patroll);
             }
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(updateStateTime);
         }
     }
 

@@ -1,4 +1,4 @@
-﻿﻿using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
@@ -37,21 +37,23 @@ public class DinoController : MonoBehaviour
         gameController = GameController.instance;
         gameController.AddDinoToList(gameObject);
         gameController.UpdateAliveDino();
-        
+
         StartCoroutine(nameof(CheckNearEgg));
     }
-    
+
     private void FixedUpdate()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit);
-            if (hit.collider.CompareTag("Enemy") &&
-                Vector3.Distance(transform.position, hit.collider.transform.position) <= attackDistanse && 
-            isSelected)
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit))
             {
-                HPOfAttackedTarget = hit.collider.gameObject.GetComponent<HPController>();
-                AttackEnemy();
+                if (hit.collider.CompareTag("Enemy") &&
+                    Vector3.Distance(transform.position, hit.collider.transform.position) <= attackDistanse &&
+                    isSelected)
+                {
+                    HPOfAttackedTarget = hit.collider.gameObject.GetComponent<HPController>();
+                    AttackEnemy();
+                }
             }
         }
 
@@ -84,17 +86,16 @@ public class DinoController : MonoBehaviour
     {
         while (isOpeningEgg)
         {
-            
-            if ( HPOfAttackedTarget!=null)
+            if (HPOfAttackedTarget != null)
             {
                 HPOfAttackedTarget.takeDamage(damage);
-                
             }
             else
             {
                 target = null;
                 isOpeningEgg = false;
             }
+
             yield return new WaitForSeconds(attackWaitTime);
         }
     }
@@ -126,6 +127,7 @@ public class DinoController : MonoBehaviour
                 target = null;
                 isOpeningEgg = false;
             }
+
             yield return new WaitForSeconds(0.5f);
         }
     }

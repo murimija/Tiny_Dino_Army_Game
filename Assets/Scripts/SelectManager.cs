@@ -25,12 +25,6 @@ public class SelectManager : MonoBehaviour
     private void Start()
     {
         CreatePointToGoMatrix();
-
-
-        for (int i = 0; i < 10; i++)
-        {
-            Debug.Log(pointToGoMatrix[i]);
-        }
     }
 
     // Update is called once per frame
@@ -89,7 +83,6 @@ public class SelectManager : MonoBehaviour
                 if (selectedUnits[i] != null)
                 {
                     selectedUnits[i].GetComponent<DinoController>().GoToNewPlace(hit.point + pointToGoMatrix[i]);
-                    Debug.Log(pointToGoMatrix[i]);
                 }
             }
 

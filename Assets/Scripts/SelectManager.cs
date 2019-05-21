@@ -12,6 +12,8 @@ public class SelectManager : MonoBehaviour
 
     [SerializeField] private GameObject plaseToGoPref;
 
+    private CameraController cameraController;
+
     private void OnGUI()
     {
         if (isDragging)
@@ -25,6 +27,7 @@ public class SelectManager : MonoBehaviour
     private void Start()
     {
         CreatePointToGoMatrix();
+        cameraController = CameraController.instance;
     }
 
     // Update is called once per frame
@@ -77,16 +80,18 @@ public class SelectManager : MonoBehaviour
 
         if (Input.GetMouseButtonUp(1) && selectedUnits.Count != 0)
         {
-            Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
-            for (var i = 0; i < selectedUnits.Count; i++)
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
             {
-                if (selectedUnits[i] != null)
+                for (var i = 0; i < selectedUnits.Count; i++)
                 {
-                    selectedUnits[i].GetComponent<DinoController>().GoToNewPlace(hit.point + pointToGoMatrix[i]);
+                    if (selectedUnits[i] != null)
+                    {
+                        selectedUnits[i].GetComponent<DinoController>().GoToNewPlace(hit.point + pointToGoMatrix[i]);
+                    }
                 }
+                cameraController.CameraFollow(hit.point);
+                Destroy(Instantiate(plaseToGoPref, hit.point, Quaternion.identity), 1f);
             }
-
-            Destroy(Instantiate(plaseToGoPref, hit.point, Quaternion.identity), 1f);
         }
     }
 

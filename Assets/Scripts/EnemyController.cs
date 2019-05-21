@@ -42,7 +42,7 @@ public class EnemyController : MonoBehaviour
     {
         Attack,
         Follow,
-        Patroll
+        Patrol
     }
 
     private State currentState;
@@ -51,9 +51,9 @@ public class EnemyController : MonoBehaviour
     {
         if (currentState == newState) return;
 
-        if (newState == State.Patroll)
+        if (newState == State.Patrol)
         {
-            currentState = State.Patroll;
+            currentState = State.Patrol;
             StartCoroutine(nameof(Patrol));
         }
         else if (newState == State.Follow)
@@ -80,7 +80,7 @@ public class EnemyController : MonoBehaviour
 
     private IEnumerator Patrol()
     {
-        while (currentState == State.Patroll)
+        while (currentState == State.Patrol)
         {
             if (enemyAgent.remainingDistance <= MinDistToPatrollPoint)
             {
@@ -157,7 +157,7 @@ public class EnemyController : MonoBehaviour
             else
             {
                 target = null;
-                ChangeState(State.Patroll);
+                ChangeState(State.Patrol);
             }
             yield return new WaitForSeconds(updateStateTime);
         }

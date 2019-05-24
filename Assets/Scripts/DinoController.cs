@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.EventSystems;
 
 public class DinoController : MonoBehaviour
 {
@@ -22,8 +21,10 @@ public class DinoController : MonoBehaviour
     public int damage;
 
     [SerializeField] private float openEggDistance;
-    [SerializeField] private float attackWaitTime;
-    [SerializeField] private float attackDistanse;
+    [SerializeField] private float openEggWaitTime;
+    [SerializeField] private float attackDistance;
+
+    private int openEggDamage = 1;
 
     private GameController gameController;
     private GameObject[] eggs;
@@ -47,8 +48,8 @@ public class DinoController : MonoBehaviour
         {
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit))
             {
-                if (hit.collider.CompareTag("Enemy") &&
-                    Vector3.Distance(transform.position, hit.collider.transform.position) <= attackDistanse &&
+                if ((hit.collider.CompareTag("Enemy") || hit.collider.CompareTag("Boss")) &&
+                    Vector3.Distance(transform.position, hit.collider.transform.position) <= attackDistance &&
                     isSelected)
                 {
                     HPOfAttackedTarget = hit.collider.gameObject.GetComponent<HPController>();
@@ -88,7 +89,7 @@ public class DinoController : MonoBehaviour
         {
             if (HPOfAttackedTarget != null)
             {
-                HPOfAttackedTarget.takeDamage(damage);
+                HPOfAttackedTarget.takeDamage(openEggDamage);
             }
             else
             {
@@ -96,7 +97,7 @@ public class DinoController : MonoBehaviour
                 isOpeningEgg = false;
             }
 
-            yield return new WaitForSeconds(attackWaitTime);
+            yield return new WaitForSeconds(openEggWaitTime);
         }
     }
 
@@ -104,32 +105,36 @@ public class DinoController : MonoBehaviour
     {
         while (true)
         {
-            shortestDistanceToEdd = Mathf.Infinity;
-
-            GameObject nearestEgg = null;
-
-            foreach (var egg in gameController.listOfEggs)
+            if (!isOpeningEgg)
             {
-                var distanceToEgg = Vector3.Distance(transform.position, egg.transform.position);
-                if (!(distanceToEgg < shortestDistanceToEdd)) continue;
-                shortestDistanceToEdd = distanceToEgg;
-                nearestEgg = egg;
-            }
+                shortestDistanceToEdd = Mathf.Infinity;
+
+                GameObject nearestEgg = null;
+
+                foreach (var egg in gameController.listOfEggs)
+                {
+                    float distanceToEgg = Vector3.Distance(transform.position, egg.transform.position);
+                    if (!(distanceToEgg < shortestDistanceToEdd)) continue;
+                    shortestDistanceToEdd = distanceToEgg;
+                    nearestEgg = egg;
+                }
 
 
-            if (nearestEgg != null && shortestDistanceToEdd <= openEggDistance && !isOpeningEgg)
-            {
-                target = nearestEgg;
-                StartOpenEgg();
-            }
-            else
-            {
-                target = null;
-                isOpeningEgg = false;
+                if (nearestEgg != null && shortestDistanceToEdd <= openEggDistance && !isOpeningEgg)
+                {
+                    target = nearestEgg;
+                    StartOpenEgg();
+                }
+                else
+                {
+                    target = null;
+                    isOpeningEgg = false;
+                }
             }
 
             yield return new WaitForSeconds(0.5f);
         }
+        // ReSharper disable once IteratorNeverReturns
     }
 
     private void OnDrawGizmosSelected()
@@ -139,7 +144,7 @@ public class DinoController : MonoBehaviour
         Gizmos.DrawWireSphere(position, openEggDistance);
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(position, attackDistanse);
+        Gizmos.DrawWireSphere(position, attackDistance);
     }
 
     public void SetHighlightState(bool state)

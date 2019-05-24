@@ -15,15 +15,12 @@ public class GameController : MonoBehaviour
     }
 
     [SerializeField] private Text numOfDinosText;
-    [SerializeField] private Text damageOfDinosText;
-    private int damageOfArmy;
 
     private SceneChanger sceneChanger;
     private GameObject[] aliveDino;
 
     public List<GameObject> listOfEggs = new List<GameObject>();
     public List<GameObject> listOfDino = new List<GameObject>();
-    public List<GameObject> listOfEnemy = new List<GameObject>();
 
     private void Start()
     {
@@ -38,17 +35,8 @@ public class GameController : MonoBehaviour
             GameOver();
             return;
         }
-
-        damageOfArmy = 0;
-
-/*        for (var i = 0; i < listOfDino.Count; i++)
-        {
-            var dino = aliveDino[i];
-            damageOfArmy += dino.GetComponent<DinoController>().damage;
-        }*/
-
+        
         numOfDinosText.text = listOfDino.Count.ToString();
-//        damageOfDinosText.text = damageOfArmy.ToString();
     }
 
     public void DinoDeathReport(GameObject dinoToRemove)

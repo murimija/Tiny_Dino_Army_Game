@@ -2,19 +2,19 @@
 
 public static class ScreenHelper
 {
-    static Texture2D _whiteTexture;
-    public static Texture2D WhiteTexture
+    private static Texture2D whiteTexture;
+    private static Texture2D WhiteTexture
     {
         get
         {
-            if (_whiteTexture == null)
+            if (whiteTexture == null)
             {
-                _whiteTexture = new Texture2D(1, 1);
-                _whiteTexture.SetPixel(0, 0, Color.white);
-                _whiteTexture.Apply();
+                whiteTexture = new Texture2D(1, 1);
+                whiteTexture.SetPixel(0, 0, Color.white);
+                whiteTexture.Apply();
             }
 
-            return _whiteTexture;
+            return whiteTexture;
         }
     }
 

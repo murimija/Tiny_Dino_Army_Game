@@ -8,6 +8,7 @@ TagManager:
   - PlayersDino
   - Enemy
   - Highlight
+  - Boss
   layers:
   - Default
   - TransparentFX
@@ -22,7 +23,7 @@ TagManager:
   - Egg
   - EnemyArea
   - Minimap
-  - 
+  - Relief
   - 
   - 
   - 

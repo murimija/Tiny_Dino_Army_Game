@@ -12,8 +12,6 @@ public class CameraController : MonoBehaviour
         instance = this;
     }
 
-    [SerializeField] private float panSpeed;
-
     [SerializeField] private float minZ;
     [SerializeField] private float maxZ;
     [SerializeField] private float minX;
@@ -33,11 +31,11 @@ public class CameraController : MonoBehaviour
         target = newPosition;
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        if (Vector3.Distance(transform.position, target) > 0.1)
+        if (Vector3.Distance(transform.position, target) > 0.05)
         {
-            Vector3 smoothedPosition = Vector3.Lerp(transform.position, target, smoothSpeed);
+            var smoothedPosition = Vector3.Lerp(transform.position, target, smoothSpeed);
             transform.position = smoothedPosition;
         }
     }

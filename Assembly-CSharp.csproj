@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\EnemyArea.cs" />
     <Compile Include="Assets\Scripts\EnemyController.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />
+    <Compile Include="Assets\Scripts\HowToPlayMenu.cs" />
     <Compile Include="Assets\Scripts\HPController.cs" />
     <Compile Include="Assets\Scripts\PauseMenu.cs" />
     <Compile Include="Assets\Scripts\SceneChanger.cs" />

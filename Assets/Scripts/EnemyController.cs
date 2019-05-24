@@ -20,6 +20,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private float attackWaitTime;
     [SerializeField] private GameObject partForRotation;
     [SerializeField] private GameObject exclamationMarkPref;
+    [SerializeField] private Transform exclMarkSpawnPos;
 
     private int numOfActualPatrolPoint;
     private NavMeshAgent enemyAgent;
@@ -28,7 +29,7 @@ public class EnemyController : MonoBehaviour
     private float timeToUpdate;
     private float MinDistToPatrollPoint;
     private Vector3 nextPatrollPoint;
-
+    
     private static readonly int IsAttack = Animator.StringToHash("isAttack");
     private static readonly int TakeDamage = Animator.StringToHash("takeDamage");
     private GameObject[] dinos;
@@ -51,20 +52,21 @@ public class EnemyController : MonoBehaviour
     {
         if (currentState == newState) return;
 
-        if (newState == State.Patrol)
+        // ReSharper disable once SwitchStatementMissingSomeCases
+        switch (newState)
         {
-            currentState = State.Patrol;
-            StartCoroutine(nameof(Patrol));
-        }
-        else if (newState == State.Follow)
-        {
-            currentState = State.Follow;
-            StartCoroutine(nameof(Follow));
-        }
-        else
-        {
-            currentState = State.Attack;
-            StartCoroutine(nameof(Attack));
+            case State.Patrol:
+                currentState = State.Patrol;
+                StartCoroutine(nameof(Patrol));
+                break;
+            case State.Follow:
+                currentState = State.Follow;
+                StartCoroutine(nameof(Follow));
+                break;
+            default:
+                currentState = State.Attack;
+                StartCoroutine(nameof(Attack));
+                break;
         }
     }
 
@@ -100,10 +102,10 @@ public class EnemyController : MonoBehaviour
     private IEnumerator Follow()
     {
         Destroy(
-            Instantiate(exclamationMarkPref, gameObject.transform.position, Quaternion.identity,
+            Instantiate(exclamationMarkPref, exclMarkSpawnPos.position, Quaternion.identity,
                 gameObject.transform), 1f);
 
-        while (currentState == State.Follow)
+        while (currentState == State.Follow && enemyAgent!= null)
         {
             enemyAgent.SetDestination(target.transform.position);
             yield return new WaitForSeconds(updateStateTime);
@@ -138,7 +140,7 @@ public class EnemyController : MonoBehaviour
             GameObject nearestDino = null;
             foreach (var dino in gameController.listOfDino)
             {
-                var distanceToEnemy = Vector3.Distance(transform.position, dino.transform.position);
+                float distanceToEnemy = Vector3.Distance(transform.position, dino.transform.position);
                 if (!(distanceToEnemy < shortestDistance)) continue;
                 shortestDistance = distanceToEnemy;
                 nearestDino = dino;
@@ -161,6 +163,7 @@ public class EnemyController : MonoBehaviour
             }
             yield return new WaitForSeconds(updateStateTime);
         }
+        // ReSharper disable once IteratorNeverReturns
     }
 
     private void OnDrawGizmosSelected()

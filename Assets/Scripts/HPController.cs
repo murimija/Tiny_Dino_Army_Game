@@ -8,12 +8,13 @@ public class HPController : MonoBehaviour
     [SerializeField] private GameObject healthBarPref;
     [SerializeField] private Image healthBarImage;
     private bool helthBarExsist;
-    private bool isDead = false;
-
+    private bool isDead;
+    private SceneChanger sceneChanger;
     private void Start()
     {
         currentHealthPoints = maxHealthPoints;
         helthBarExsist = false;
+        sceneChanger = SceneChanger.instance;
     }
 
     public void takeDamage(int damage)
@@ -39,10 +40,20 @@ public class HPController : MonoBehaviour
     {
         if (gameObject.CompareTag("Egg"))
             gameObject.GetComponent<EggController>().OpenEgg();
-        if (gameObject.CompareTag("PlayersDino"))
+        else if (gameObject.CompareTag("PlayersDino"))
             gameObject.GetComponent<DinoController>().Death();
-        if (gameObject.CompareTag("Enemy"))
+        else if (gameObject.CompareTag("Enemy"))
             gameObject.GetComponent<EnemyController>().Death();
-
+        else if (gameObject.CompareTag("Boss"))
+        {
+            gameObject.GetComponent<EnemyController>().Death();
+            WinGame();
+        }
     }
+
+    private void WinGame()
+    {
+        sceneChanger.GoToScene("WinScreen");
+    }
+    
 }

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 517461156151044541}
-  m_Layer: 12
+  m_Layer: 13
   m_Name: Minimap_ground_block
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3363269664995598818}
   - component: {fileID: 7751907522673111175}
-  m_Layer: 12
+  m_Layer: 13
   m_Name: Minimap_coner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -119,8 +119,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5136385016008358044}
-  m_Layer: 0
-  m_Name: BlockCornerLarge
+  m_Layer: 13
+  m_Name: blockCornerLarge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -152,6 +152,10 @@ PrefabInstance:
     - target: {fileID: 100000, guid: e6ad8a0934c8ef3479eaf8fbcd3d9797, type: 3}
       propertyPath: m_Name
       value: blockCornerLarge
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: e6ad8a0934c8ef3479eaf8fbcd3d9797, type: 3}
+      propertyPath: m_Layer
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: e6ad8a0934c8ef3479eaf8fbcd3d9797, type: 3}
       propertyPath: m_LocalPosition.x

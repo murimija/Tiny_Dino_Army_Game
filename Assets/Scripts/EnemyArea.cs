@@ -21,7 +21,7 @@ public class EnemyArea : MonoBehaviour
         var patrolPointsСollection = new GameObject();
         patrolPointsСollection.transform.SetParent(gameObject.transform);
         patrolPointsСollection.name = "PatrolPointsСollection";
-        for (var i = 0; i < numOfPatrolPoints; i++)
+        for (int i = 0; i < numOfPatrolPoints; i++)
         {
             var patrolPoint = Instantiate(patrolPointPref,
                 new Vector3(Random.Range(bounds.min.x, bounds.max.x), bounds.max.y,
@@ -50,5 +50,6 @@ public class EnemyArea : MonoBehaviour
 
             yield return new WaitForSeconds(timeSpanWait);
         }
+        // ReSharper disable once IteratorNeverReturns
     }
 }

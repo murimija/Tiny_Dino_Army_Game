@@ -187,7 +187,7 @@ MonoBehaviour:
   highlightPref: {fileID: 6329697426753139521}
   damage: 2
   openEggDistance: 0.2
-  openEggWaitTime: 0.5
+  openEggWaitTime: 0.8
   attackDistance: 0.3
 --- !u!195 &9018303125610067489
 NavMeshAgent:
